@@ -5,6 +5,3 @@ verify_jwt = false
 
 [functions.send-contact-email]
 verify_jwt = false
-
-[functions.send-email-via-emailjs]
-verify_jwt = false
