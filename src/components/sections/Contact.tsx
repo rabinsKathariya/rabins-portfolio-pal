@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Mail, Linkedin, MapPin, Send, Loader2 } from 'lucide-react';
+import { Mail, Linkedin, MapPin, Send, Loader2, Github, Facebook } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -24,11 +26,11 @@ export const Contact = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -38,7 +40,6 @@ export const Contact = () => {
     e.preventDefault();
     setErrors({});
 
-    // Validate form data
     const result = contactSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: { [key: string]: string } = {};
@@ -54,7 +55,6 @@ export const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Save to database
       const { error: dbError } = await supabase
         .from('contact_submissions')
         .insert([{
@@ -66,7 +66,6 @@ export const Contact = () => {
 
       if (dbError) throw dbError;
 
-      // Send email notification
       const { error: emailError } = await supabase.functions.invoke('send-contact-email', {
         body: {
           name: result.data.name,
@@ -78,7 +77,6 @@ export const Contact = () => {
 
       if (emailError) {
         console.error('Email error:', emailError);
-        // Still show success since data was saved
       }
 
       toast({
@@ -99,11 +97,35 @@ export const Contact = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  const socialLinks = [
+    { icon: Linkedin, href: 'https://www.linkedin.com/in/rabins-kathariya-6b3616366/', label: 'LinkedIn', name: 'Rabins Kathariya' },
+    { icon: Github, href: 'https://github.com/rabinsKathariya', label: 'GitHub', name: 'rabinsKathariya' },
+    { icon: Facebook, href: 'https://www.facebook.com/rabins.kathariya.1', label: 'Facebook', name: 'Rabins Kathariya' },
+  ];
+
   return (
-    <section id="contact" className="py-20 md:py-32">
-      <div className="section-container">
+    <section id="contact" className="py-20 md:py-32 overflow-hidden">
+      <div className="section-container" ref={ref}>
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           <span className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             Contact
           </span>
@@ -114,11 +136,16 @@ export const Contact = () => {
             Have a question or want to work together? Feel free to reach out.
             I'd love to hear from you!
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <motion.div
+          className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isVisible ? 'visible' : 'hidden'}
+        >
           {/* Contact info */}
-          <div>
+          <motion.div variants={itemVariants}>
             <h3 className="text-2xl font-bold text-foreground mb-6">
               Let's Connect
             </h3>
@@ -130,7 +157,10 @@ export const Contact = () => {
 
             {/* Contact details */}
             <div className="space-y-6 mb-8">
-              <div className="flex items-center gap-4">
+              <motion.div
+                className="flex items-center gap-4"
+                whileHover={{ x: 5 }}
+              >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                   <Mail className="w-5 h-5" />
                 </div>
@@ -140,26 +170,35 @@ export const Contact = () => {
                     insrab464@gmail.com
                   </a>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                  <Linkedin className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">LinkedIn</p>
-                  <a
-                    href="https://www.linkedin.com/in/rabins-kathariya-6b3616366/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-foreground hover:text-primary transition-colors"
-                  >
-                    Rabins Kathariya
-                  </a>
-                </div>
-              </div>
+              {socialLinks.map((social) => (
+                <motion.div
+                  key={social.label}
+                  className="flex items-center gap-4"
+                  whileHover={{ x: 5 }}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                    <social.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">{social.label}</p>
+                    <a
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-foreground hover:text-primary transition-colors"
+                    >
+                      {social.name}
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
 
-              <div className="flex items-center gap-4">
+              <motion.div
+                className="flex items-center gap-4"
+                whileHover={{ x: 5 }}
+              >
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                   <MapPin className="w-5 h-5" />
                 </div>
@@ -167,18 +206,21 @@ export const Contact = () => {
                   <p className="text-sm text-muted-foreground">Location</p>
                   <p className="text-foreground">Nepal</p>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Availability badge */}
-            <div className="glass-card p-4 inline-flex items-center gap-3">
+            <motion.div
+              className="glass-card p-4 inline-flex items-center gap-3"
+              whileHover={{ scale: 1.02 }}
+            >
               <span className="w-3 h-3 bg-data-green rounded-full animate-pulse" />
               <span className="text-foreground font-medium">Available for freelance work</span>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Contact form */}
-          <div className="glass-card p-6 md:p-8">
+          <motion.div variants={itemVariants} className="glass-card p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
@@ -261,8 +303,8 @@ export const Contact = () => {
                 )}
               </Button>
             </form>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

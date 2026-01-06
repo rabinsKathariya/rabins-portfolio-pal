@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 interface Skill {
   name: string;
@@ -45,6 +47,7 @@ const categories = [
 
 export const Skills = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   const filteredSkills = activeCategory === 'all' 
     ? skills 
@@ -60,11 +63,29 @@ export const Skills = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4 } },
+  };
+
   return (
-    <section id="skills" className="py-20 md:py-32">
-      <div className="section-container">
+    <section id="skills" className="py-20 md:py-32 overflow-hidden">
+      <div className="section-container" ref={ref}>
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           <span className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             My Skills
           </span>
@@ -75,12 +96,17 @@ export const Skills = () => {
             A comprehensive overview of my technical skills, from Python programming and data science
             to web development and various programming languages.
           </p>
-        </div>
+        </motion.div>
 
         {/* Category filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        <motion.div
+          className="flex flex-wrap justify-center gap-3 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           {categories.map((category) => (
-            <button
+            <motion.button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
               className={cn(
@@ -89,68 +115,94 @@ export const Skills = () => {
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
               )}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {category.name}
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Skills grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSkills.map((skill, index) => (
-            <div
-              key={skill.name}
-              className="glass-card p-6 hover-lift"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="flex justify-between items-center mb-3">
-                <h4 className="font-semibold text-foreground">{skill.name}</h4>
-                <span className="text-sm text-muted-foreground font-mono">{skill.level}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className={cn('h-full rounded-full bg-gradient-to-r transition-all duration-1000', getSkillColor(skill.category))}
-                  style={{ width: `${skill.level}%` }}
-                />
-              </div>
-              <div className="mt-2 flex justify-between text-xs text-muted-foreground">
-                <span>Beginner</span>
-                <span>Expert</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <motion.div
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isVisible ? 'visible' : 'hidden'}
+        >
+          <AnimatePresence mode="wait">
+            {filteredSkills.map((skill, index) => (
+              <motion.div
+                key={skill.name}
+                variants={itemVariants}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3, delay: index * 0.03 }}
+                className="glass-card p-6 group cursor-pointer"
+                whileHover={{ y: -5, scale: 1.02 }}
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">{skill.name}</h4>
+                  <motion.span
+                    className="text-sm text-muted-foreground font-mono"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 + index * 0.05 }}
+                  >
+                    {skill.level}%
+                  </motion.span>
+                </div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <motion.div
+                    className={cn('h-full rounded-full bg-gradient-to-r', getSkillColor(skill.category))}
+                    initial={{ width: 0 }}
+                    animate={isVisible ? { width: `${skill.level}%` } : { width: 0 }}
+                    transition={{ duration: 1, delay: 0.3 + index * 0.05, ease: 'easeOut' }}
+                  />
+                </div>
+                <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+                  <span>Beginner</span>
+                  <span>Expert</span>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Additional info cards */}
-        <div className="grid md:grid-cols-3 gap-6 mt-12">
-          <div className="glass-card p-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🐍</span>
-            </div>
-            <h4 className="font-semibold text-foreground mb-2">Python Focus</h4>
-            <p className="text-sm text-muted-foreground">
-              Primary programming language with focus on data science and automation
-            </p>
-          </div>
-          <div className="glass-card p-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-data-green/10 flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">📊</span>
-            </div>
-            <h4 className="font-semibold text-foreground mb-2">Data Enthusiast</h4>
-            <p className="text-sm text-muted-foreground">
-              Passionate about data cleaning, analysis, and visualization
-            </p>
-          </div>
-          <div className="glass-card p-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">🌐</span>
-            </div>
-            <h4 className="font-semibold text-foreground mb-2">Web Basics</h4>
-            <p className="text-sm text-muted-foreground">
-              Foundation in HTML, CSS, and JavaScript for web development
-            </p>
-          </div>
-        </div>
+        <motion.div
+          className="grid md:grid-cols-3 gap-6 mt-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          {[
+            { emoji: '🐍', title: 'Python Focus', desc: 'Primary programming language with focus on data science and automation', color: 'primary' },
+            { emoji: '📊', title: 'Data Enthusiast', desc: 'Passionate about data cleaning, analysis, and visualization', color: 'data-green' },
+            { emoji: '🌐', title: 'Web Basics', desc: 'Foundation in HTML, CSS, and JavaScript for web development', color: 'accent' },
+          ].map((item, index) => (
+            <motion.div
+              key={item.title}
+              className="glass-card p-6 text-center"
+              whileHover={{ y: -5, scale: 1.02 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isVisible ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.5 + index * 0.1 }}
+            >
+              <motion.div
+                className={`w-12 h-12 rounded-full bg-${item.color}/10 flex items-center justify-center mx-auto mb-4`}
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="text-2xl">{item.emoji}</span>
+              </motion.div>
+              <h4 className="font-semibold text-foreground mb-2">{item.title}</h4>
+              <p className="text-sm text-muted-foreground">{item.desc}</p>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );
