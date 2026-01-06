@@ -5,6 +5,33 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory rate limiting
+const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute
+const MAX_MESSAGES_PER_REQUEST = 20; // Limit conversation depth
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  if (!record) {
+    rateLimitMap.set(ip, { count: 1, timestamp: now });
+    return false;
+  }
+  
+  if (now - record.timestamp > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, timestamp: now });
+    return false;
+  }
+  
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+  
+  record.count++;
+  return false;
+}
 const PORTFOLIO_CONTEXT = `You are a friendly virtual assistant for Rabins Kathariya's portfolio website. Your role is to answer questions about Rabins in a helpful and engaging way.
 
 About Rabins Kathariya:
@@ -67,7 +94,56 @@ serve(async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Rate limiting
+    const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || 
+                     req.headers.get("x-real-ip") || 
+                     "unknown";
+    
+    if (isRateLimited(clientIP)) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again in a minute." }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+
     const { messages } = await req.json() as { messages: Message[] };
+
+    // Validate message array
+    if (!Array.isArray(messages)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid request format" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Limit conversation depth to prevent abuse
+    if (messages.length > MAX_MESSAGES_PER_REQUEST) {
+      return new Response(
+        JSON.stringify({ error: "Conversation too long. Please start a new chat." }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Validate each message
+    for (const msg of messages) {
+      if (!msg.role || !msg.content || typeof msg.content !== 'string') {
+        return new Response(
+          JSON.stringify({ error: "Invalid message format" }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+      // Limit individual message length
+      if (msg.content.length > 2000) {
+        return new Response(
+          JSON.stringify({ error: "Message too long" }),
+          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        );
+      }
+    }
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) {
