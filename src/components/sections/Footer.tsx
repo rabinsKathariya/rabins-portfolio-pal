@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, Heart, Facebook } from 'lucide-react';
+import { Github, Linkedin, Mail, Facebook } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const Footer = () => {
@@ -86,12 +86,9 @@ export const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t border-border flex justify-center items-center">
           <p className="text-sm text-muted-foreground">
             © {currentYear} Rabins Kathariya. All rights reserved.
-          </p>
-          <p className="text-sm text-muted-foreground flex items-center gap-1">
-            Made with <Heart className="w-4 h-4 text-destructive fill-destructive" /> using React & Tailwind
           </p>
         </div>
       </div>
