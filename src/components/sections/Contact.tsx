@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Linkedin, MapPin, Send, Loader2, Github, Facebook } from 'lucide-react';
+import { Mail, Linkedin, MapPin, Send, Loader2, Github, Facebook, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,6 +8,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+import emailjs from '@emailjs/browser';
+
+// EmailJS configuration
+const EMAILJS_SERVICE_ID = 'service_v5z4koq';
+const EMAILJS_TEMPLATE_ID = 'template_f33vvvt';
+const EMAILJS_PUBLIC_KEY = '7juuk495PmFvPwNg3';
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -55,7 +61,28 @@ export const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const { error: dbError } = await supabase
+      // Send email via EmailJS
+      const emailParams = {
+        from_name: result.data.name,
+        from_email: result.data.email,
+        subject: result.data.subject || 'New Contact Form Submission',
+        message: result.data.message,
+        to_email: 'insrab464@gmail.com',
+      };
+
+      const emailResponse = await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        emailParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
+      if (emailResponse.status !== 200) {
+        throw new Error('Failed to send email');
+      }
+
+      // Also save to database as backup
+      await supabase
         .from('contact_submissions')
         .insert([{
           name: result.data.name,
@@ -64,32 +91,17 @@ export const Contact = () => {
           message: result.data.message,
         }]);
 
-      if (dbError) throw dbError;
-
-      const { error: emailError } = await supabase.functions.invoke('send-contact-email', {
-        body: {
-          name: result.data.name,
-          email: result.data.email,
-          subject: result.data.subject || 'New Contact Form Submission',
-          message: result.data.message,
-        },
-      });
-
-      if (emailError) {
-        console.error('Email error:', emailError);
-      }
-
       toast({
-        title: 'Message Sent!',
-        description: 'Thank you for reaching out. I\'ll get back to you soon!',
+        title: '✅ Message Sent Successfully!',
+        description: 'Thank you for reaching out. I\'ll get back to you within 24-48 hours!',
       });
 
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
       console.error('Submission error:', error);
       toast({
-        title: 'Error',
-        description: 'Something went wrong. Please try again.',
+        title: 'Error Sending Message',
+        description: 'Something went wrong. Please try again or email me directly at insrab464@gmail.com',
         variant: 'destructive',
       });
     } finally {
