@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { ExternalLink, Github } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -20,64 +18,56 @@ interface Project {
   category: string;
   tools: string[];
   image: string;
-  github?: string;
-  demo?: string;
 }
 
 const projects: Project[] = [
   {
     id: 1,
     title: 'Snake Game',
-    description: 'Classic snake game built using Pygame with smooth animations, score tracking, and increasing difficulty levels.',
+    description: 'A classic arcade-style snake game built with Python and Pygame. Features smooth animations, real-time score tracking, increasing difficulty as the snake grows, and responsive keyboard controls. The game showcases fundamental game development concepts including collision detection and game state management.',
     category: 'python',
     tools: ['Python', 'Pygame'],
     image: snakeGameImg,
-    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 2,
     title: 'Sales Data Analysis',
-    description: 'Comprehensive analysis of sales data using Pandas and visualization with Matplotlib and Seaborn to uncover trends.',
+    description: 'An in-depth exploratory data analysis project on retail sales data. Utilized Pandas for data manipulation, identified seasonal trends and customer purchasing patterns, and created compelling visualizations with Matplotlib and Seaborn to present actionable business insights.',
     category: 'data',
     tools: ['Python', 'Pandas', 'Matplotlib', 'Seaborn'],
     image: salesAnalysisImg,
-    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 3,
     title: 'Weather Data Visualization',
-    description: 'Interactive weather data visualization project showing temperature trends and patterns over time.',
+    description: 'An interactive data visualization project analyzing historical weather patterns. Features temperature trend analysis, precipitation comparisons, and seasonal pattern recognition using NumPy for calculations and Matplotlib for creating informative charts and graphs.',
     category: 'data',
     tools: ['Python', 'NumPy', 'Matplotlib'],
     image: weatherVizImg,
-    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 4,
     title: 'Personal Portfolio',
-    description: 'Responsive portfolio website showcasing projects and skills using modern web technologies.',
+    description: 'A fully responsive personal portfolio website designed to showcase projects and skills. Built with modern web technologies featuring clean UI design, smooth animations, mobile-first approach, and optimized performance for an engaging user experience.',
     category: 'web',
     tools: ['HTML', 'CSS', 'JavaScript'],
     image: portfolioImg,
-    demo: '#',
   },
   {
     id: 5,
     title: 'Tic-Tac-Toe AI',
-    description: 'Tic-tac-toe game with an AI opponent using minimax algorithm for unbeatable gameplay.',
+    description: 'An intelligent Tic-Tac-Toe game featuring an unbeatable AI opponent powered by the minimax algorithm. Includes player vs AI mode, clean visual interface built with Pygame, move highlighting, and game state tracking with win detection.',
     category: 'python',
     tools: ['Python', 'Pygame'],
     image: tictactoeImg,
-    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 6,
     title: 'CSV Data Cleaner',
-    description: 'Automated tool for cleaning and preprocessing CSV files with duplicate removal and data validation.',
+    description: 'A powerful automated tool for preprocessing and cleaning messy CSV datasets. Features include duplicate detection and removal, handling missing values, data type validation, column standardization, and exporting cleaned data ready for analysis.',
     category: 'data',
     tools: ['Python', 'Pandas'],
     image: csvCleanerImg,
-    github: 'https://github.com/rabinsKathariya',
   },
 ];
 
@@ -90,6 +80,7 @@ const categories = [
 
 export const Projects = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   const filteredProjects = activeCategory === 'all'
@@ -136,7 +127,7 @@ export const Projects = () => {
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             A collection of my work ranging from Python applications and data analysis
-            to web development projects.
+            to web development projects. Click on any project to learn more.
           </p>
         </motion.div>
 
@@ -182,21 +173,25 @@ export const Projects = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="glass-card overflow-hidden group"
+                className="glass-card overflow-hidden group cursor-pointer"
+                onClick={() => setSelectedProject(project)}
+                whileHover={{ y: -8, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 {/* Project image */}
-                <motion.div
-                  className="aspect-video relative overflow-hidden"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
+                <div className="aspect-video relative overflow-hidden">
                   <img
                     src={project.image}
                     alt={project.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </motion.div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="px-4 py-2 bg-primary/90 text-primary-foreground rounded-full text-sm font-medium">
+                      Click to view details
+                    </span>
+                  </div>
+                </div>
 
                 <div className="p-6">
                   {/* Category badge */}
@@ -212,7 +207,7 @@ export const Projects = () => {
                   </p>
 
                   {/* Tools */}
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex flex-wrap gap-2">
                     {project.tools.map((tool) => (
                       <span
                         key={tool}
@@ -222,32 +217,69 @@ export const Projects = () => {
                       </span>
                     ))}
                   </div>
-
-                  {/* Links */}
-                  <div className="flex gap-2">
-                    {project.github && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={project.github} target="_blank" rel="noopener noreferrer">
-                          <Github className="w-4 h-4 mr-1" />
-                          Code
-                        </a>
-                      </Button>
-                    )}
-                    {project.demo && (
-                      <Button variant="default" size="sm" asChild>
-                        <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-1" />
-                          Demo
-                        </a>
-                      </Button>
-                    )}
-                  </div>
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Project Detail Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedProject(null)}
+          >
+            <motion.div
+              className="bg-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl border border-border"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative">
+                <img
+                  src={selectedProject.image}
+                  alt={selectedProject.title}
+                  className="w-full aspect-video object-cover rounded-t-2xl"
+                />
+                <button
+                  onClick={() => setSelectedProject(null)}
+                  className="absolute top-4 right-4 w-10 h-10 bg-card/80 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground hover:bg-card transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-6 md:p-8">
+                <span className={cn('inline-block px-3 py-1 rounded-full text-xs font-medium mb-4', getCategoryColor(selectedProject.category))}>
+                  {selectedProject.category === 'python' ? 'Python' : selectedProject.category === 'data' ? 'Data Analysis' : 'Web'}
+                </span>
+                <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                  {selectedProject.title}
+                </h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  {selectedProject.description}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedProject.tools.map((tool) => (
+                    <span
+                      key={tool}
+                      className="px-3 py-1.5 bg-muted rounded-full text-sm font-mono text-muted-foreground"
+                    >
+                      {tool}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
