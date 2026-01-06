@@ -228,14 +228,14 @@ export const Projects = () => {
       <AnimatePresence>
         {selectedProject && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-md"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSelectedProject(null)}
           >
             <motion.div
-              className="bg-card rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-auto shadow-2xl border border-border"
+              className="bg-card rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-auto shadow-2xl border border-border"
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -246,11 +246,12 @@ export const Projects = () => {
                 <img
                   src={selectedProject.image}
                   alt={selectedProject.title}
-                  className="w-full aspect-video object-cover rounded-t-2xl"
+                  className="w-full h-auto max-h-[60vh] object-contain bg-black/50 rounded-t-2xl"
+                  style={{ imageRendering: 'crisp-edges' }}
                 />
                 <button
                   onClick={() => setSelectedProject(null)}
-                  className="absolute top-4 right-4 w-10 h-10 bg-card/80 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground hover:bg-card transition-colors"
+                  className="absolute top-4 right-4 w-10 h-10 bg-card/90 backdrop-blur-sm rounded-full flex items-center justify-center text-foreground hover:bg-card hover:scale-110 transition-all shadow-lg"
                 >
                   ✕
                 </button>
@@ -262,7 +263,7 @@ export const Projects = () => {
                 <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                   {selectedProject.title}
                 </h3>
-                <p className="text-muted-foreground mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed text-base md:text-lg">
                   {selectedProject.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
