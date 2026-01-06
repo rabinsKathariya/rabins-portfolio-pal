@@ -8,12 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import emailjs from '@emailjs/browser';
-
-// EmailJS configuration
-const EMAILJS_SERVICE_ID = 'service_v5z4koq';
-const EMAILJS_TEMPLATE_ID = 'template_f33vvvt';
-const EMAILJS_PUBLIC_KEY = '7juuk495PmFvPwNg3';
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -61,24 +55,18 @@ export const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Send email via EmailJS
-      const emailParams = {
-        from_name: result.data.name,
-        from_email: result.data.email,
-        subject: result.data.subject || 'New Contact Form Submission',
-        message: result.data.message,
-        to_email: 'insrab464@gmail.com',
-      };
+      // Send email via Edge Function (secure, rate-limited)
+      const { data, error } = await supabase.functions.invoke('send-email-via-emailjs', {
+        body: {
+          name: result.data.name,
+          email: result.data.email,
+          subject: result.data.subject || 'New Contact Form Submission',
+          message: result.data.message,
+        },
+      });
 
-      const emailResponse = await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        emailParams,
-        EMAILJS_PUBLIC_KEY
-      );
-
-      if (emailResponse.status !== 200) {
-        throw new Error('Failed to send email');
+      if (error) {
+        throw new Error(error.message || 'Failed to send email');
       }
 
       // Also save to database as backup
