@@ -55,8 +55,8 @@ export const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Send email via Edge Function (secure, rate-limited)
-      const { data, error } = await supabase.functions.invoke('send-email-via-emailjs', {
+      // Send email via Resend Edge Function (secure, server-side)
+      const { data, error } = await supabase.functions.invoke('send-contact-email', {
         body: {
           name: result.data.name,
           email: result.data.email,
