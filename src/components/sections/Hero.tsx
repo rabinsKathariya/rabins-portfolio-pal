@@ -1,6 +1,7 @@
 import { ArrowDown, Download, Mail, Github, Linkedin, Facebook, Code2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import profileImage from '@/assets/profile.png';
 
 export const Hero = () => {
@@ -100,20 +101,23 @@ export const Hero = () => {
             transition={{ duration: 0.6, type: 'spring', stiffness: 100 }}
             className="mb-8"
           >
-            <div className="relative inline-block">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg mx-auto relative">
-                <img
-                  src={profileImage}
-                  alt="Rabins Kathariya"
-                  className="w-full h-full object-cover"
+              <Link to="/profile-picture" className="relative inline-block group cursor-pointer">
+                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-primary/30 shadow-lg mx-auto relative group-hover:border-primary/60 transition-all duration-300">
+                  <img
+                    src={profileImage}
+                    alt="Rabins Kathariya"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <motion.div
+                  className="absolute inset-0 rounded-full border-4 border-primary/50"
+                  animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
                 />
-              </div>
-              <motion.div
-                className="absolute inset-0 rounded-full border-4 border-primary/50"
-                animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </div>
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="bg-background/80 px-2 py-1 rounded text-xs text-foreground">Click to view</span>
+                </div>
+              </Link>
           </motion.div>
 
           {/* Status badge */}
