@@ -99,10 +99,11 @@ serve(async (req: Request): Promise<Response> => {
         headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Email error:", error);
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
