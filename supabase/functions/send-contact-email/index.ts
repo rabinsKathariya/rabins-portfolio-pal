@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "onboarding@resend.dev";
+const NOTIFY_TO_EMAIL = Deno.env.get("CONTACT_NOTIFY_TO_EMAIL") || "insrab464@gmail.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -97,8 +99,8 @@ serve(async (req: Request): Promise<Response> => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Portfolio Contact <onboarding@resend.dev>",
-        to: ["insrab464@gmail.com"],
+        from: `Rabins <${FROM_EMAIL}>`,
+        to: [NOTIFY_TO_EMAIL],
         subject: `New Contact: ${safeSubject}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
@@ -133,7 +135,7 @@ serve(async (req: Request): Promise<Response> => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Rabins Kathariya <onboarding@resend.dev>",
+        from: `Rabins Kathariya <${FROM_EMAIL}>`,
         to: [email],
         subject: "Thanks for reaching out!",
         html: `
