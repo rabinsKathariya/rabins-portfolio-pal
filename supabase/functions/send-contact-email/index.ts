@@ -7,6 +7,18 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// HTML escape function to prevent XSS in email clients
+function escapeHtml(text: string): string {
+  const htmlEntities: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
+}
+
 interface ContactRequest {
   name: string;
   email: string;
@@ -26,6 +38,12 @@ serve(async (req: Request): Promise<Response> => {
 
     const { name, email, subject, message }: ContactRequest = await req.json();
 
+    // Escape all user inputs to prevent XSS
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeSubject = escapeHtml(subject);
+    const safeMessage = escapeHtml(message);
+
     console.log("Sending contact email notification...");
 
     // Send notification email to Rabins
@@ -38,19 +56,19 @@ serve(async (req: Request): Promise<Response> => {
       body: JSON.stringify({
         from: "Portfolio Contact <onboarding@resend.dev>",
         to: ["insrab464@gmail.com"],
-        subject: `New Contact: ${subject}`,
+        subject: `New Contact: ${safeSubject}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #0d9488, #3b82f6); padding: 30px; border-radius: 10px 10px 0 0;">
               <h1 style="color: white; margin: 0;">📬 New Portfolio Contact</h1>
             </div>
             <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px;">
-              <p><strong>From:</strong> ${name}</p>
-              <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-              <p><strong>Subject:</strong> ${subject}</p>
+              <p><strong>From:</strong> ${safeName}</p>
+              <p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
+              <p><strong>Subject:</strong> ${safeSubject}</p>
               <p><strong>Message:</strong></p>
               <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #0d9488;">
-                ${message}
+                ${safeMessage}
               </div>
             </div>
           </div>
@@ -78,7 +96,7 @@ serve(async (req: Request): Promise<Response> => {
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #0d9488, #3b82f6); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0;">Thanks for reaching out, ${name}! 👋</h1>
+              <h1 style="color: white; margin: 0;">Thanks for reaching out, ${safeName}! 👋</h1>
             </div>
             <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px;">
               <p>I've received your message and I'm excited to hear from you!</p>
