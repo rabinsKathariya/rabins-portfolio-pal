@@ -1,7 +1,17 @@
 import { useState } from 'react';
-import { ExternalLink, Github, Folder } from 'lucide-react';
+import { ExternalLink, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useScrollAnimation } from '@/hooks/useScrollAnimation';
+
+// Import project images
+import snakeGameImg from '@/assets/projects/snake-game.png';
+import salesAnalysisImg from '@/assets/projects/sales-analysis.png';
+import weatherVizImg from '@/assets/projects/weather-viz.png';
+import portfolioImg from '@/assets/projects/portfolio.png';
+import tictactoeImg from '@/assets/projects/tictactoe.png';
+import csvCleanerImg from '@/assets/projects/csv-cleaner.png';
 
 interface Project {
   id: number;
@@ -9,7 +19,7 @@ interface Project {
   description: string;
   category: string;
   tools: string[];
-  image?: string;
+  image: string;
   github?: string;
   demo?: string;
 }
@@ -21,7 +31,8 @@ const projects: Project[] = [
     description: 'Classic snake game built using Pygame with smooth animations, score tracking, and increasing difficulty levels.',
     category: 'python',
     tools: ['Python', 'Pygame'],
-    github: '#',
+    image: snakeGameImg,
+    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 2,
@@ -29,7 +40,8 @@ const projects: Project[] = [
     description: 'Comprehensive analysis of sales data using Pandas and visualization with Matplotlib and Seaborn to uncover trends.',
     category: 'data',
     tools: ['Python', 'Pandas', 'Matplotlib', 'Seaborn'],
-    github: '#',
+    image: salesAnalysisImg,
+    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 3,
@@ -37,7 +49,8 @@ const projects: Project[] = [
     description: 'Interactive weather data visualization project showing temperature trends and patterns over time.',
     category: 'data',
     tools: ['Python', 'NumPy', 'Matplotlib'],
-    github: '#',
+    image: weatherVizImg,
+    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 4,
@@ -45,6 +58,7 @@ const projects: Project[] = [
     description: 'Responsive portfolio website showcasing projects and skills using modern web technologies.',
     category: 'web',
     tools: ['HTML', 'CSS', 'JavaScript'],
+    image: portfolioImg,
     demo: '#',
   },
   {
@@ -53,7 +67,8 @@ const projects: Project[] = [
     description: 'Tic-tac-toe game with an AI opponent using minimax algorithm for unbeatable gameplay.',
     category: 'python',
     tools: ['Python', 'Pygame'],
-    github: '#',
+    image: tictactoeImg,
+    github: 'https://github.com/rabinsKathariya',
   },
   {
     id: 6,
@@ -61,7 +76,8 @@ const projects: Project[] = [
     description: 'Automated tool for cleaning and preprocessing CSV files with duplicate removal and data validation.',
     category: 'data',
     tools: ['Python', 'Pandas'],
-    github: '#',
+    image: csvCleanerImg,
+    github: 'https://github.com/rabinsKathariya',
   },
 ];
 
@@ -74,6 +90,7 @@ const categories = [
 
 export const Projects = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const { ref, isVisible } = useScrollAnimation({ threshold: 0.1 });
 
   const filteredProjects = activeCategory === 'all'
     ? projects
@@ -88,11 +105,29 @@ export const Projects = () => {
     }
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
   return (
-    <section id="projects" className="py-20 md:py-32 bg-muted/30">
-      <div className="section-container">
+    <section id="projects" className="py-20 md:py-32 bg-muted/30 overflow-hidden">
+      <div className="section-container" ref={ref}>
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           <span className="inline-block px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
             Portfolio
           </span>
@@ -103,12 +138,17 @@ export const Projects = () => {
             A collection of my work ranging from Python applications and data analysis
             to web development projects.
           </p>
-        </div>
+        </motion.div>
 
         {/* Category filters */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        <motion.div
+          className="flex flex-wrap justify-center gap-3 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           {categories.map((category) => (
-            <button
+            <motion.button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
               className={cn(
@@ -117,74 +157,96 @@ export const Projects = () => {
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-card text-muted-foreground hover:bg-primary/10 hover:text-primary border border-border'
               )}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               {category.name}
-            </button>
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
         {/* Projects grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project, index) => (
-            <div
-              key={project.id}
-              className="glass-card overflow-hidden group hover-lift"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              {/* Project image placeholder */}
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center relative overflow-hidden">
-                <Folder className="w-16 h-16 text-primary/40" />
-                <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
+        <motion.div
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isVisible ? 'visible' : 'hidden'}
+        >
+          <AnimatePresence mode="wait">
+            {filteredProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                variants={itemVariants}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                className="glass-card overflow-hidden group"
+              >
+                {/* Project image */}
+                <motion.div
+                  className="aspect-video relative overflow-hidden"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </motion.div>
 
-              <div className="p-6">
-                {/* Category badge */}
-                <span className={cn('inline-block px-3 py-1 rounded-full text-xs font-medium mb-3', getCategoryColor(project.category))}>
-                  {project.category === 'python' ? 'Python' : project.category === 'data' ? 'Data Analysis' : 'Web'}
-                </span>
+                <div className="p-6">
+                  {/* Category badge */}
+                  <span className={cn('inline-block px-3 py-1 rounded-full text-xs font-medium mb-3', getCategoryColor(project.category))}>
+                    {project.category === 'python' ? 'Python' : project.category === 'data' ? 'Data Analysis' : 'Web'}
+                  </span>
 
-                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                  {project.description}
-                </p>
+                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
+                    {project.description}
+                  </p>
 
-                {/* Tools */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tools.map((tool) => (
-                    <span
-                      key={tool}
-                      className="px-2 py-1 bg-muted rounded text-xs font-mono text-muted-foreground"
-                    >
-                      {tool}
-                    </span>
-                  ))}
+                  {/* Tools */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {project.tools.map((tool) => (
+                      <span
+                        key={tool}
+                        className="px-2 py-1 bg-muted rounded text-xs font-mono text-muted-foreground"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Links */}
+                  <div className="flex gap-2">
+                    {project.github && (
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={project.github} target="_blank" rel="noopener noreferrer">
+                          <Github className="w-4 h-4 mr-1" />
+                          Code
+                        </a>
+                      </Button>
+                    )}
+                    {project.demo && (
+                      <Button variant="default" size="sm" asChild>
+                        <a href={project.demo} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Demo
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
-
-                {/* Links */}
-                <div className="flex gap-2">
-                  {project.github && (
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={project.github} target="_blank" rel="noopener noreferrer">
-                        <Github className="w-4 h-4 mr-1" />
-                        Code
-                      </a>
-                    </Button>
-                  )}
-                  {project.demo && (
-                    <Button variant="default" size="sm" asChild>
-                      <a href={project.demo} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-1" />
-                        Demo
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
     </section>
   );
