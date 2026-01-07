@@ -46,6 +46,8 @@ export const About = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
+  const resumeUrl = `${import.meta.env.BASE_URL}resume.pdf`;
+
   return (
     <section id="about" className="py-20 md:py-32 bg-muted/30 overflow-hidden">
       <div className="section-container" ref={ref}>
@@ -177,7 +179,7 @@ export const About = () => {
             {/* Download Resume Button */}
             <div className="mb-8">
               <Button variant="hero" size="lg" asChild>
-                <a href="/resume.pdf" download="Rabins_Kathariya_CV.pdf">
+                <a href={resumeUrl} download="Rabins_Kathariya_CV.pdf">
                   <Download className="w-4 h-4 mr-2" />
                   Download My Resume
                 </a>
