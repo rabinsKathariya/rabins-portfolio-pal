@@ -99,22 +99,40 @@ serve(async (req: Request): Promise<Response> => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: `Rabins <${FROM_EMAIL}>`,
+        from: `Portfolio Contact Form <${FROM_EMAIL}>`,
         to: [NOTIFY_TO_EMAIL],
-        subject: `New Contact: ${safeSubject}`,
+        reply_to: email, // Allow direct reply to the sender
+        subject: `Portfolio Message from ${safeName}: ${safeSubject}`,
+        text: `New contact form submission from your portfolio website.\n\nFrom: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}\n\n---\nThis email was sent from your portfolio contact form at rabinskathariya.com.np`,
         html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <div style="background: linear-gradient(135deg, #0d9488, #3b82f6); padding: 30px; border-radius: 10px 10px 0 0;">
-              <h1 style="color: white; margin: 0;">📬 New Portfolio Contact</h1>
+          <div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            <div style="background-color: #0d9488; padding: 24px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 600;">New Portfolio Contact</h1>
             </div>
-            <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 10px 10px;">
-              <p><strong>From:</strong> ${safeName}</p>
-              <p><strong>Email:</strong> <a href="mailto:${safeEmail}">${safeEmail}</a></p>
-              <p><strong>Subject:</strong> ${safeSubject}</p>
-              <p><strong>Message:</strong></p>
-              <div style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #0d9488;">
-                ${safeMessage}
+            <div style="padding: 24px; background-color: #f9fafb;">
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #374151; width: 80px;">From:</td>
+                  <td style="padding: 8px 0; color: #111827;">${safeName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #374151;">Email:</td>
+                  <td style="padding: 8px 0;"><a href="mailto:${safeEmail}" style="color: #0d9488;">${safeEmail}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-weight: 600; color: #374151;">Subject:</td>
+                  <td style="padding: 8px 0; color: #111827;">${safeSubject}</td>
+                </tr>
+              </table>
+              <div style="margin-top: 16px;">
+                <p style="font-weight: 600; color: #374151; margin-bottom: 8px;">Message:</p>
+                <div style="background-color: #ffffff; padding: 16px; border-radius: 6px; border: 1px solid #e5e7eb; color: #111827; line-height: 1.6;">
+                  ${safeMessage.replace(/\n/g, '<br>')}
+                </div>
               </div>
+            </div>
+            <div style="padding: 16px 24px; background-color: #f3f4f6; text-align: center; font-size: 12px; color: #6b7280;">
+              <p style="margin: 0;">This email was sent from your portfolio contact form at rabinskathariya.com.np</p>
             </div>
           </div>
         `,
