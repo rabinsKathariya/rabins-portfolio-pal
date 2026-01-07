@@ -4,7 +4,10 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
+// For GitHub Pages, set VITE_BASE_PATH env variable to your repo name (e.g., "/repo-name/")
 export default defineConfig(({ mode }) => ({
+  // Base path for GitHub Pages - uses env variable or defaults to "/" for Lovable/local dev
+  base: process.env.VITE_BASE_PATH || "/",
   server: {
     host: "::",
     port: 8080,
@@ -14,5 +17,9 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  build: {
+    outDir: "dist",
+    assetsDir: "assets",
   },
 }));
