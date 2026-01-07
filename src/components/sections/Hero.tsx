@@ -13,6 +13,8 @@ export const Hero = () => {
     document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const resumeUrl = `${import.meta.env.BASE_URL}resume.pdf`;
+
   return (
     <section
       id="home"
@@ -186,7 +188,7 @@ export const Hero = () => {
               Contact Me
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href="/resume.pdf" download="Rabins_Kathariya_CV.pdf">
+              <a href={resumeUrl} download="Rabins_Kathariya_CV.pdf">
                 <Download className="w-4 h-4" />
                 Download Resume
               </a>
