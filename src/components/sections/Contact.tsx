@@ -81,7 +81,7 @@ export const Contact = () => {
 
       toast({
         title: '✅ Message Sent Successfully!',
-        description: 'Thank you for reaching out. I\'ll get back to you within 24-48 hours!',
+        description: 'Thank you for reaching out! Check your email for a confirmation. I\'ll get back to you within 24-48 hours!',
       });
 
       setFormData({ name: '', email: '', subject: '', message: '' });
