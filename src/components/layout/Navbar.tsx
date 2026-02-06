@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import logoImg from '@/assets/logo.png';
 
 const navLinks = [
   { name: 'Home', href: '#home' },
@@ -81,13 +82,18 @@ export const Navbar = () => {
           {/* Logo */}
           <a
             href="#home"
-            className="text-xl md:text-2xl font-bold gradient-text hover:scale-105 transition-transform"
+            className="flex items-center gap-2 hover:scale-105 transition-transform shrink-0"
             onClick={(e) => {
               e.preventDefault();
               handleNavClick('#home');
             }}
           >
-            RK
+            <img
+              src={logoImg}
+              alt="Rabins Kathariya Logo"
+              className="h-9 w-9 md:h-11 md:w-11 rounded-full object-cover border-2 border-primary/30"
+            />
+            <span className="text-lg md:text-xl font-bold gradient-text">RK</span>
           </a>
 
           {/* Desktop Navigation */}
