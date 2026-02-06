@@ -1,5 +1,6 @@
 import { Github, Linkedin, Mail, Facebook } from 'lucide-react';
 import { motion } from 'framer-motion';
+import logoImg from '@/assets/logo.png';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -23,10 +24,15 @@ export const Footer = () => {
           <div>
             <motion.a
               href="#home"
-              className="text-2xl font-bold gradient-text mb-4 inline-block"
+              className="flex items-center gap-2 mb-4 inline-flex"
               whileHover={{ scale: 1.05 }}
             >
-              RK
+              <img
+                src={logoImg}
+                alt="Rabins Kathariya Logo"
+                className="h-10 w-10 rounded-full object-cover border-2 border-primary/30"
+              />
+              <span className="text-2xl font-bold gradient-text">RK</span>
             </motion.a>
             <p className="text-muted-foreground mb-4">
               Computer Engineering student passionate about Python, data science,
