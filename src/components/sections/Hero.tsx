@@ -240,7 +240,7 @@ export const Hero = () => {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-none">
+      <div className="absolute bottom-2 md:bottom-8 left-0 right-0 flex justify-center pointer-events-none">
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
