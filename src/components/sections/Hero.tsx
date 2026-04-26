@@ -200,7 +200,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.5 }}
-            className="flex justify-center gap-4"
+            className="flex justify-center gap-4 mb-16 md:mb-0"
           >
             <motion.a
               href="https://www.linkedin.com/in/rabins-kathariya-6b3616366/"
