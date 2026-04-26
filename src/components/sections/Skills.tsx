@@ -11,12 +11,12 @@ interface Skill {
 
 const skills: Skill[] = [
   // Python & Libraries
-  { name: 'Python', level: 75, category: 'python' },
-  { name: 'NumPy', level: 65, category: 'python' },
-  { name: 'Pandas', level: 70, category: 'python' },
-  { name: 'Matplotlib', level: 60, category: 'python' },
-  { name: 'Seaborn', level: 55, category: 'python' },
-  { name: 'Pygame', level: 50, category: 'python' },
+  { name: 'Python', level: 65, category: 'python' },
+  { name: 'NumPy', level: 50, category: 'python' },
+  { name: 'Pandas', level: 50, category: 'python' },
+  { name: 'Matplotlib', level: 45, category: 'python' },
+  { name: 'Seaborn', level: 45, category: 'python' },
+  { name: 'Pygame', level: 45, category: 'python' },
   
   // Data Skills
   { name: 'Data Entry', level: 85, category: 'data' },
