@@ -200,7 +200,7 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.5 }}
-            className="flex justify-center gap-4"
+            className="flex justify-center gap-4 mb-16 md:mb-0"
           >
             <motion.a
               href="https://www.linkedin.com/in/rabins-kathariya-6b3616366/"
@@ -240,7 +240,7 @@ export const Hero = () => {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-none">
+      <div className="absolute bottom-6 md:bottom-8 left-0 right-0 flex justify-center pointer-events-none">
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
