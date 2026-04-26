@@ -122,7 +122,7 @@ export const About = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4 mt-8 pt-8 border-t border-border w-full">
                   {[
-                    { value: '5+', label: 'Languages' },
+                    { value: '3', label: 'Languages' },
                     { value: '10+', label: 'Projects' },
                     { value: '4+', label: 'Libraries' },
                   ].map((stat, index) => (
